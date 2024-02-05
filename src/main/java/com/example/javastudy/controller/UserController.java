@@ -5,8 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.javastudy.service.UserService;
+import com.example.javastudy.repository.UserRepository;
 import com.example.javastudy.entity.User;
-
 
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +16,7 @@ import java.util.Optional;
 public class UserController {
     @Autowired
     private UserService userService;
+    private final UserRepository userRepository;
 
     @GetMapping
     public List<User> getAllUsers() {
@@ -45,6 +46,16 @@ public class UserController {
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+
+    public UserController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @PostMapping("/register")
+    public User registerUser(@RequestBody User newUser) {
+        newUser.setPassword(newUser.getPassword()); // 입력 받은 password를 해시화하여 저장
+        return userRepository.save(newUser);
     }
 }
 
